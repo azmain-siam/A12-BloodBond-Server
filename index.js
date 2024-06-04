@@ -48,6 +48,9 @@ const client = new MongoClient(uri, {
 
 async function run() {
   try {
+    // Collections
+    const requestsCollection = client.db("bloodbondDB").collection("requests");
+
     // auth related api
     app.post("/jwt", async (req, res) => {
       const user = req.body;
@@ -62,6 +65,13 @@ async function run() {
         })
         .send({ success: true });
     });
+
+    // get data from requests collection
+    app.get("/requests", async (req, res) => {
+      const result = await requestsCollection.find().toArray();
+      res.send(result);
+    });
+
     // Logout
     app.get("/logout", async (req, res) => {
       try {

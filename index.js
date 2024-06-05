@@ -72,6 +72,14 @@ async function run() {
       res.send(result);
     });
 
+    // get single data from requests collection
+    app.get("/request/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await requestsCollection.findOne(query);
+      res.send(result);
+    });
+
     // Logout
     app.get("/logout", async (req, res) => {
       try {

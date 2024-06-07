@@ -66,6 +66,13 @@ async function run() {
         .send({ success: true });
     });
 
+    // Post data to requests collection
+    app.post("/requests", async (req, res) => {
+      const requestData = req.body;
+      const result = await requestsCollection.insertOne(requestData);
+      res.send(result);
+    });
+
     // get data from requests collection
     app.get("/requests", async (req, res) => {
       const result = await requestsCollection.find().toArray();

@@ -113,6 +113,14 @@ async function run() {
       res.send(result);
     });
 
+    // Delete a request
+    app.delete("/my-requests/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await requestsCollection.deleteOne(query);
+      res.send(result);
+    });
+
     // Logout
     app.get("/logout", async (req, res) => {
       try {

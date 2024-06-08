@@ -79,11 +79,37 @@ async function run() {
       res.send(result);
     });
 
+    app.get("/my-requests/:email", async (req, res) => {
+      const email = req.params.email;
+      const query = { requester_email: email };
+      const result = await requestsCollection.find(query).toArray();
+      res.send(result);
+    });
+
     // get single data from requests collection
-    app.get("/request/:id", async (req, res) => {
+    app.get("/requests/:id", async (req, res) => {
       const id = req.params.id;
       const query = { _id: new ObjectId(id) };
       const result = await requestsCollection.findOne(query);
+      res.send(result);
+    });
+
+    // Update specific data
+    app.put("/request/:id", async (req, res) => {
+      const requestData = req.body;
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const option = { upsert: true };
+      const updatedRequest = {
+        $set: {
+          ...requestData,
+        },
+      };
+      const result = await requestsCollection.updateOne(
+        query,
+        updatedRequest,
+        option
+      );
       res.send(result);
     });
 

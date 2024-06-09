@@ -59,13 +59,6 @@ async function run() {
         expiresIn: "365d",
       });
       res.send({ token });
-      // res
-      //   .cookie("token", token, {
-      //     httpOnly: true,
-      //     secure: process.env.NODE_ENV === "production",
-      //     sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
-      //   })
-      //   .send({ success: true });
     });
 
     // Users related api

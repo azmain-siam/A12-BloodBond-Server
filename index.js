@@ -86,6 +86,19 @@ async function run() {
       res.send(result);
     });
 
+    app.put("/user/:email", async (req, res) => {
+      const userData = req.body;
+      const email = req.params.email;
+      const query = { email };
+      const updatedUser = {
+        $set: {
+          ...userData,
+        },
+      };
+      const result = await usersCollection.updateOne(query, updatedUser);
+      res.send(result);
+    });
+
     app.get("/user/admin/:email", verifyToken, async (req, res) => {
       const email = req.params.email;
       if (email !== req.decoded.email) {

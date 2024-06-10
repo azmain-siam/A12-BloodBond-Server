@@ -98,6 +98,23 @@ async function run() {
       res.send(result);
     });
 
+    // Update user role
+    app.patch(
+      "/user/update/:email",
+      verifyToken,
+      verifyAdmin,
+      async (req, res) => {
+        const email = req.params.email;
+        const user = req.body;
+        const query = { email };
+        const updateDoc = {
+          $set: { ...user },
+        };
+        const result = await usersCollection.updateOne(query, updateDoc);
+        res.send(result);
+      }
+    );
+
     app.get("/user/admin/:email", verifyToken, async (req, res) => {
       const email = req.params.email;
       if (email !== req.decoded.email) {

@@ -71,6 +71,18 @@ async function run() {
       next();
     };
 
+    // Verify admin
+    const verifyVolunteer = async (req, res, next) => {
+      const email = req.decoded.email;
+      const query = { email: email };
+      const user = await usersCollection.findOne(query);
+      const isVolunteer = user?.role === "volunteer";
+      if (!isVolunteer) {
+        return res.status(403).send({ message: "fobidden access" });
+      }
+      next();
+    };
+
     // Users related api
     app.post("/users", async (req, res) => {
       const user = req.body;
@@ -129,11 +141,22 @@ async function run() {
       res.send({ admin });
     });
 
-    app.get("/users", verifyToken, verifyAdmin, async (req, res) => {
+    app.get("/users", verifyToken, async (req, res) => {
       console.log(req.headers);
       const result = await usersCollection.find().toArray();
       res.send(result);
     });
+
+    app.get(
+      "/user/volunteer",
+      verifyToken,
+      verifyVolunteer,
+      async (req, res) => {
+        console.log(req.headers);
+        const result = await usersCollection.find().toArray();
+        res.send(result);
+      }
+    );
 
     // Post data to requests collection
     app.post("/requests", verifyToken, async (req, res) => {

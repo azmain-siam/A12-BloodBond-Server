@@ -199,9 +199,27 @@ async function run() {
     });
 
     // Blog related api
-    app.post("/blogs", async (req, res) => {
+    app.post("/blogs", verifyToken, verifyAdmin, async (req, res) => {
       const blog = req.body;
       const result = await blogsCollection.insertOne(blog);
+      res.send(result);
+    });
+
+    // Get blogs from blogs collection
+    app.get("/blogs", async (req, res) => {
+      const result = await blogsCollection.find().toArray();
+      res.send(result);
+    });
+
+    // Update status of blog
+    app.patch("/blog/:id", verifyToken, verifyAdmin, async (req, res) => {
+      const id = req.params.id;
+      const blog = req.body;
+      const query = { _id: new ObjectId(id) };
+      const updateBlog = {
+        $set: { ...blog },
+      };
+      const result = await blogsCollection.updateOne(query, updateBlog);
       res.send(result);
     });
 

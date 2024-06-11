@@ -5,7 +5,6 @@ const cors = require("cors");
 const cookieParser = require("cookie-parser");
 const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 const jwt = require("jsonwebtoken");
-
 const port = process.env.PORT || 5000;
 
 // middleware
@@ -49,6 +48,7 @@ async function run() {
     // Collections
     const requestsCollection = client.db("bloodbondDB").collection("requests");
     const usersCollection = client.db("bloodbondDB").collection("users");
+    const blogsCollection = client.db("bloodbondDB").collection("blogs");
 
     // auth related api
     app.post("/jwt", async (req, res) => {
@@ -195,6 +195,13 @@ async function run() {
       const id = req.params.id;
       const query = { _id: new ObjectId(id) };
       const result = await requestsCollection.findOne(query);
+      res.send(result);
+    });
+
+    // Blog related api
+    app.post("/blogs", async (req, res) => {
+      const blog = req.body;
+      const result = await blogsCollection.insertOne(blog);
       res.send(result);
     });
 

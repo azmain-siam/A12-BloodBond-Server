@@ -171,6 +171,18 @@ async function run() {
       res.send(result);
     });
 
+    // Donate and update request
+    app.patch("/request/update/:id", verifyToken, async (req, res) => {
+      const id = req.params.id;
+      const request = req.body;
+      const query = { _id: new ObjectId(id) };
+      const updatedRequest = {
+        $set: { ...request },
+      };
+      const result = await requestsCollection.updateOne(query, updatedRequest);
+      res.send(result);
+    });
+
     app.get("/my-requests/:email", verifyToken, async (req, res) => {
       const email = req.params.email;
       const query = { requester_email: email };

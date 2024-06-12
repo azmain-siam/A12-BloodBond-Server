@@ -284,7 +284,7 @@ async function run() {
     });
 
     // Payment intent
-    app.post("/create-payment-intent", async (req, res) => {
+    app.post("/create-payment-intent", verifyToken, async (req, res) => {
       const { price } = req.body;
       const amount = parseInt(price * 100);
 
@@ -303,6 +303,20 @@ async function run() {
     app.post("/funds", verifyToken, async (req, res) => {
       const paymentData = req.body;
       const result = await fundsCollection.insertOne(paymentData);
+      res.send(result);
+    });
+
+    // get transactions from database
+    app.get("/funds", verifyToken, async (req, res) => {
+      const result = await fundsCollection.find().toArray();
+      res.send(result);
+    });
+
+    // get specified transactions from database for email
+    app.get("/fund/:email", verifyToken, async (req, res) => {
+      const email = req.params.email;
+      const query = { email };
+      const result = await fundsCollection.find(query).toArray();
       res.send(result);
     });
 

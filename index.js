@@ -5,6 +5,7 @@ const cors = require("cors");
 const cookieParser = require("cookie-parser");
 const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 const jwt = require("jsonwebtoken");
+const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 const port = process.env.PORT || 5000;
 
 // middleware
@@ -49,6 +50,7 @@ async function run() {
     const requestsCollection = client.db("bloodbondDB").collection("requests");
     const usersCollection = client.db("bloodbondDB").collection("users");
     const blogsCollection = client.db("bloodbondDB").collection("blogs");
+    const fundsCollection = client.db("bloodbondDB").collection("funds");
 
     // auth related api
     app.post("/jwt", async (req, res) => {
@@ -141,8 +143,7 @@ async function run() {
       res.send({ admin });
     });
 
-    app.get("/users", verifyToken, async (req, res) => {
-      console.log(req.headers);
+    app.get("/users", async (req, res) => {
       const result = await usersCollection.find().toArray();
       res.send(result);
     });
@@ -280,6 +281,29 @@ async function run() {
       } catch (err) {
         res.status(500).send(err);
       }
+    });
+
+    // Payment intent
+    app.post("/create-payment-intent", async (req, res) => {
+      const { price } = req.body;
+      const amount = parseInt(price * 100);
+
+      const paymentIntent = await stripe.paymentIntents.create({
+        amount: amount,
+        currency: "usd",
+        payment_method_types: ["card"],
+      });
+
+      res.send({
+        clientSecret: paymentIntent.client_secret,
+      });
+    });
+
+    // Save transactions to database
+    app.post("/funds", verifyToken, async (req, res) => {
+      const paymentData = req.body;
+      const result = await fundsCollection.insertOne(paymentData);
+      res.send(result);
     });
 
     // Send a ping to confirm a successful connection
